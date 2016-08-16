@@ -61,7 +61,8 @@
              Make an AJAX post request using JQuery,
              change the first parameter to your charge script
             */
-            $.post("/echo/html/",myData,
+            $.post("https://tonicdev.io/thor-stripe/57b25cb7fa19311200f10aab/branches/master"
+                ,myData,
                 function(data) {
                 
                 // if you get some results back update results
@@ -86,7 +87,8 @@
             // Open Checkout with further options
             handler.open({
               name: 'Thor\'s fresh Smoothies',
-              description: 'Electric Kale'
+              description: 'Electric Kale',
+              amount: Math.round($("#amount").val() * 100)
             });
             
         } 
