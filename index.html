@@ -1,0 +1,105 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Stripe Demo Template</title>
+  <meta name="description" content="Stripe Demo Template">
+  <meta name="author" content="Thor">
+
+  <style>
+    button,input { font-size:1.5em; padding:10px; }
+    label { display:block; }
+  </style>
+
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+  <div class="results"></div>
+  <form id="myForm">
+      <p><label for="message">Enter some message</label>
+      <input type="text" id="message" value="Hello, world"/></p>
+      <p><label for="amount">Enter some amount</label>
+      <input type="text" id="amount" value="10.00" /></p>
+      <label><input type="checkbox" id="checkbox" />Click my cool checkbox</label>
+      <p><button type="submit" id="customButton">Pay</button></p>
+  </form>
+  
+  <script>
+    // check if the amount entered is a valid dollar amount 
+    var isDollarAmt = function(amt) {
+        // matches nnnn.nn
+        var regex = /^\d+(\.\d{0,2})?$/;
+        return regex.test(amt.replace(/ /g, ''));
+    }
+    
+    // checkout handler
+    var handler = StripeCheckout.configure({
+        key: 'pk_test_IR0lZ3Ot5IQnsde6xuAmkHvB',
+        image: 'https://d30y9cdsu7xlg0.cloudfront.net/png/25309-200.png',
+        token: function(token) {
+            /* Use the token to create the charge with a server-side script.
+             You can access the token ID with `token.id`
+            
+             Pass along various parameters you get from the token response
+             and your form.
+            */
+            var myData = {
+                    token: token.id,
+                    email: token.email,
+                    amount: Math.round($("#amount").val() * 100),
+                    checkbox: $("#checkbox").val(),
+                    message: $("#message").val()
+            };
+    
+            /* 
+             Make an AJAX post request using JQuery,
+             change the first parameter to your charge script
+            */
+            $.post("/echo/html/",myData,
+                function(data) {
+                
+                // if you get some results back update results
+                $("#myForm").hide();
+                $(".results").html("Your charge was successful");
+                
+                // for demonstration purposes, loop through everything in myData
+                for (var key in myData) {
+                  $(".results").append("<br />"+key+":"+myData[key]);
+                }
+                }).fail(function() {
+                // if things fail, tell us
+                $(".results").html("I'm sorry something went wrong");
+            })
+        }
+    });
+    
+    $('#myForm').on('submit', function(e) {
+    
+        // is dollar amount valid, open check out
+        if (isDollarAmt($("#amount").val())) {
+            // Open Checkout with further options
+            handler.open({
+              name: 'Thor's fresh Smoothies',
+              description: 'Electric Kale'
+            });
+            
+        } 
+        // if not throw an error
+        else {
+            $(".results").text("That is not a valid dollar amount!");
+        }
+        e.preventDefault();
+    });
+    
+    // Close Checkout on page navigation
+    $(window).on('popstate', function() {
+        handler.close();
+    });
+  </script>
+</body>
+</html>
