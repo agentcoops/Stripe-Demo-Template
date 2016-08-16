@@ -68,7 +68,7 @@
                 // if you get some results back update results
                 $("#myForm").hide();
                 $(".results").html("Your charge was successful");
-                
+                $(".results").append(JSON.stringify(data));
                 // for demonstration purposes, loop through everything in myData
                 for (var key in myData) {
                   $(".results").append("<br />"+key+":"+myData[key]);
